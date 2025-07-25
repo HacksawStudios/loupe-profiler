@@ -1,0 +1,13 @@
+{
+    "name": "hacksaw-profiler",
+    "license": "MIT",
+    "version": "0.0.0",
+    "description": "hacksaw-profiler",
+    "releasenote": "",
+    "contributors": [
+        "eric"
+    ],
+    "dependencies": {},
+    "tags": [],
+    "classPath": "src"
+}
