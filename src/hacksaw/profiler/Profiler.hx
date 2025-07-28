@@ -3,6 +3,7 @@ package hacksaw.profiler;
 import haxe.Json;
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import thx.Assert;
 #if js
 import js.Browser;
 import js.html.AnchorElement;
@@ -53,6 +54,8 @@ class Profiler {
 	}
 
 	public static function profileBlockEnd() {
+		Assert.isTrue(_markStack.length <= 0, "There is no mark to pop. The number of profileBlockStart and profileBlockEnd do not match.");
+
 		var mark:Mark = _markStack.pop();
 		mark.timestampEnd = timestamp();
 
