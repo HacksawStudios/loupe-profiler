@@ -1,4 +1,4 @@
-package hacksaw.profiler;
+package loupe;
 
 import haxe.Json;
 import haxe.macro.Context;

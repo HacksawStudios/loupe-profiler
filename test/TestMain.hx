@@ -1,12 +1,12 @@
 package;
 
 import buddy.*;
-import hacksaw.profiler.Profiler;
+import loupe.Profiler;
 import haxe.Timer;
 
 using buddy.Should;
 
-@:build(hacksaw.profiler.Profiler.injectProfiler())
+@:build(loupe.Profiler.injectProfiler())
 class Foo {
 	@:profile
 	public function bar() {
