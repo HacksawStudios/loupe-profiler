@@ -8,4 +8,4 @@
 -dce full
 --debug
 -D buddy-colors
--w -WDeprecated
+-D no-deprecation-warnings
