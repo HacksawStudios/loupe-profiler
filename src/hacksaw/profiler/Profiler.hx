@@ -4,6 +4,9 @@ import haxe.Json;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import thx.Assert;
+
+using thx.Arrays;
+
 #if js
 import js.Browser;
 import js.html.AnchorElement;
@@ -134,19 +137,25 @@ class Profiler {
 		});
 	}
 
-	public static function dumpToJson(filename:String) {
+	public static function dumpToObject():Dynamic {
 		var traceEvents = new Array<TraceEvent>();
 
 		for (mark in _markRecord) {
 			dumpMark(mark, traceEvents);
 		}
 
-		var object = {
+		return {
 			traceEvents: traceEvents,
 			displayTimeUnit: "ms"
 		};
+	}
 
-		var jsonString = Json.stringify(object);
+	public static function dumpToJson():String {
+		return Json.stringify(dumpToObject());
+	}
+
+	public static function dumpToJsonFile(filename:String) {
+		var jsonString = dumpToJson();
 		trace(jsonString);
 		#if js
 		var blob = new Blob([jsonString], {type: "application/json"});
@@ -171,14 +180,7 @@ class Profiler {
 		if (localClass == null)
 			return fields;
 
-		for (field in fields) {
-			if (field.meta == null)
-				continue;
-
-			final meta = Lambda.find(field.meta, m -> m.name == ":profile");
-			if (meta == null)
-				continue;
-
+		fields.filter((field:Field) -> field.meta != null && field.meta.find(m -> m.name == ":profile") != null).each((field:Field) -> {
 			switch (field.kind) {
 				case FFun(func):
 					trace(field.name);
@@ -196,7 +198,7 @@ class Profiler {
 				default:
 					Context.error("Cannot mark non-function field as :profile!", Context.currentPos());
 			}
-		}
+		});
 
 		return fields;
 	}
