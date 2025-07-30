@@ -1,4 +1,4 @@
-# hacksaw-profiler
+# loupe-profiler
 A simple intstrumentation-based profiler.
 
 ## Usage

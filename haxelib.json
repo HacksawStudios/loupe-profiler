@@ -1,8 +1,8 @@
 {
-    "name": "hacksaw-profiler",
+    "name": "loupe-profiler",
     "license": "MIT",
     "version": "0.0.0",
-    "description": "hacksaw-profiler",
+    "description": "loupe-profiler",
     "releasenote": "",
     "contributors": [
         "eric"
