@@ -42,6 +42,9 @@ trace(Profiler.dumpToJson());
 ```
 You can then open up [chrome://tracing](chrome://tracing) or https://www.speedscope.app/ to view the profile and inspect it.
 
+## Testing
+You can run the unit tests with `haxe test.hxml`
+
 ## Required libs
 `thx.core`\
 `buddy`(required for unit tests)
