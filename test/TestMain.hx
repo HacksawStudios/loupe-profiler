@@ -16,12 +16,10 @@ class Foo {
 	public function new() {}
 }
 
-// Implement "Buddy" and define an array of classes within the brackets:
 class TestMain extends buddy.SingleSuite {
 	var object:Dynamic = null;
 
 	public function new() {
-		// A test suite:
 		describe("Testing", {
 			Profiler.profileBlockStart("block1");
 			Sys.sleep(0.1);
@@ -74,16 +72,8 @@ class TestMain extends buddy.SingleSuite {
 	}
 
 	function hasTraceEvent(name:String, skip:Int = 0, ph:String = "B"):Bool {
-		for (i in 0...object.traceEvents.length) {
-			final traceEvent = object.traceEvents[i];
-			if (traceEvent.name == name && traceEvent.ph == ph) {
-				if (skip > 0) {
-					skip--;
-					continue;
-				}
-				return true;
-			}
-		}
+		if (object.traceEvents.filter((event) -> event.name == name && event.ph == ph).length > skip)
+			return true;
 		return false;
 	}
 }
