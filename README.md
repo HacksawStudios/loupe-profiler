@@ -18,10 +18,10 @@ Profiler.profileBlock("block3", {
 ```hx
 @:build(hacksaw.profiler.Profiler.injectProfiler())
 class Foo {
-	@:profile
-	public function bar() {
-		// Work you want to profile
-	}
+    @:profile
+    public function bar() {
+        // Work you want to profile
+    }
 }
 ```
 ### Dumping profile to json file
