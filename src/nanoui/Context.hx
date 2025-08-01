@@ -1,6 +1,8 @@
 package nanoui;
 
 import nanoui.Defs;
+import nanoui.Stack;
+import thx.Assert;
 
 @:structInit
 class Vec2 {
@@ -161,12 +163,12 @@ class Context {
 	var number_edit_buf:String;
 	var number_edit:Defs.Id;
 	/* stacks */
-	var command_list:Array<Int>;
-	var root_list:Array<Container>;
-	var container_stack:Array<Container>;
-	var clip_stack:Array<Rect>;
-	var id_stack:Array<Id>;
-	var layout_stack:Array<Layout>;
+	var command_list:Stack<Int>;
+	var root_list:Stack<Container>;
+	var container_stack:Stack<Container>;
+	var clip_stack:Stack<Rect>;
+	var id_stack:Stack<Id>;
+	var layout_stack:Stack<Layout>;
 	/* retained state pools */
 	var container_pool:Array<PoolItem>;
 	var containers:Array<Container>;
@@ -296,9 +298,57 @@ class Context {
 		style = default_style;
 	}
 
-	public function begin():Void {}
+	public function begin():Void {
+		Assert.notNull(text_width);
+		Assert.notNull(text_height);
 
-	public function end():Void {}
+		command_list.clear();
+		root_list.clear();
+		scroll_target = null;
+		hover_root = next_hover_root;
+		next_hover_root = null;
+		mouse_delta.x = mouse_pos.x - last_mouse_pos.x;
+		mouse_delta.y = mouse_pos.y - last_mouse_pos.y;
+		frame++;
+	}
+
+	public function end():Void {
+		Assert.equals(container_stack.count, 0);
+		Assert.equals(clip_stack.count, 0);
+		Assert.equals(id_stack.count, 0);
+		Assert.equals(layout_stack.count, 0);
+
+		/* handle scroll input */
+		if (scroll_target != null) {
+			scroll_target.scroll.x += scroll_delta.x;
+			scroll_target.scroll.y += scroll_delta.y;
+		}
+		/* unset focus if focus id was not touched this frame */
+		if (updated_focus == 0) {
+			focus = 0;
+		}
+		updated_focus = 0;
+
+		/* bring hover root to front if mouse was pressed */
+		if (mouse_pressed != 0 && next_hover_root != null && next_hover_root.zindex < last_zindex && next_hover_root.zindex >= 0) {
+			bring_to_front(next_hover_root);
+		}
+		/* reset input state */
+		key_pressed = 0;
+		input_text = "";
+		mouse_pressed = 0;
+		scroll_delta = vec2(0, 0);
+		last_mouse_pos = mouse_pos;
+		/* sort root containers by zindex */
+		var n = root_list.count;
+		// root_list.sort((index) ->); //
+		// ;
+		/* set root container jump commands */
+		// ;
+		/* if this is the first container then make the first command jump to it.
+		** otherwise set the previous container's tail to jump to this one */
+		/* make the last container's tail jump to the end of command list */
+	}
 
 	public function set_focus(id:Defs.Id):Void {}
 
