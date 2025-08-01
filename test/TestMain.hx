@@ -1,8 +1,9 @@
 package;
 
 import buddy.*;
-import loupe.Profiler;
 import haxe.Timer;
+import loupe.Profiler;
+import nanoui.Context;
 
 using buddy.Should;
 

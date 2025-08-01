@@ -1,85 +1,458 @@
-package;
+package nanoui;
 
-class mu_Vec2 {
-	var x:Int;
-	var y:Int;
+import nanoui.Defs;
+
+@:structInit
+class Vec2 {
+	public var x:Int;
+	public var y:Int;
 }
-class mu_Vec2 {
-	var x:Int;
-	var y:Int;
-	var w:Int;
-	var h:Int;
+
+@:structInit class Rect {
+	public var x:Int;
+	public var y:Int;
+	public var w:Int;
+	public var h:Int;
+}
+
+@:structInit class Color {
+	public var r:Int;
+	public var g:Int;
+	public var b:Int;
+	public var a:Int;
+}
+
+@:structInit
+class PoolItem {
+	public var id:Defs.Id;
+	public var last_update:Int;
+}
+
+@:structInit
+class BaseCommand {
+	public var type:Int;
+	public var size:Int;
+}
+
+@:structInit
+class JumpCommand {
+	public var base:BaseCommand;
+	public var dst:Dynamic;
+}
+
+@:structInit
+class ClipCommand {
+	public var base:BaseCommand;
+	public var rect:Rect;
+}
+
+@:structInit
+class RectCommand {
+	public var base:BaseCommand;
+	public var rect:Rect;
+	public var color:Color;
+}
+
+@:structInit
+class TextCommand {
+	public var base:BaseCommand;
+	public var font:Font;
+	public var pos:Vec2;
+	public var color:Color;
+	public var str:String;
+}
+
+@:structInit
+class IconCommand {
+	public var base:BaseCommand;
+	public var rect:Rect;
+	public var id:Int;
+	public var color:Color;
+}
+
+enum Command {
+	Jump(cmd:JumpCommand);
+	Clip(cmd:ClipCommand);
+	Rect(cmd:RectCommand);
+	Text(cmd:TextCommand);
+	Icon(cmd:IconCommand);
+}
+
+@:structInit
+class Layout {
+	public var body:Rect;
+	public var next:Rect;
+	public var position:Vec2;
+	public var size:Vec2;
+	public var max:Vec2;
+	public var widths:Array<Int>;
+	public var items:Int;
+	public var item_index:Int;
+	public var next_row:Int;
+	public var next_type:Int;
+	public var indent:Int;
+}
+
+@:structInit
+class Container {
+	public var head:Command;
+	public var tail:Command;
+	public var rect:Rect;
+	public var body:Rect;
+	public var content_size:Vec2;
+	public var scroll:Vec2;
+	public var zindex:Int;
+	public var open:Int;
+}
+
+@:structInit
+class Style {
+	public var font:Font;
+	public var size:Vec2;
+	public var padding:Int;
+	public var spacing:Int;
+	public var indent:Int;
+	public var title_height:Int;
+	public var scrollbar_size:Int;
+	public var thumb_size:Int;
+	public var colors:Array<Color>;
+}
+
+function vec2(x:Int, y:Int):Vec2 {
+	return {x: x, y: y};
+}
+
+function rect(x:Int, y:Int, w:Int, h:Int):Rect {
+	return {
+		x: x,
+		y: y,
+		w: w,
+		h: h
+	};
+}
+
+function color(r:Int, g:Int, b:Int, a:Int):Color {
+	return {
+		r: r,
+		g: g,
+		b: b,
+		a: a
+	};
 }
 
 class Context {
-	public function mu_vec2(x: Int, y: Int): mu_Vec2;
-	public function mu_rect(x: Int, y: Int, w: Int, h: Int): mu_Rect;
-	public function mu_color(r: Int, g: Int, b: Int, a: Int): mu_Color;
+	/* callbacks */
+	public var text_width:(font:Font, str:String, len:Int) -> Int;
+	public var text_height:(font:Font) -> Int;
+	public var draw_frame:(ctx:Context, rect:Rect, colorid:Int) -> Void;
 
-	public function mu_init(ctx: mu_Context): Void;
-	public function mu_begin(ctx: mu_Context): Void;
-	public function mu_end(ctx: mu_Context): Void;
-	public function mu_set_focus(ctx: mu_Context, id: mu_Id): Void;
-	public function mu_get_id(ctx: mu_Context, data: Dynamic, size: Int): mu_Id;
-	public function mu_push_id(ctx: mu_Context, data: Dynamic, size: Int): Void;
-	public function mu_pop_id(ctx: mu_Context): Void;
-	public function mu_push_clip_rect(ctx: mu_Context, rect: mu_Rect): Void;
-	public function mu_pop_clip_rect(ctx: mu_Context): Void;
-	public function mu_get_clip_rect(ctx: mu_Context): mu_Rect;
-	public function mu_check_clip(ctx: mu_Context, r: mu_Rect): Int;
-	public function mu_get_current_container(ctx: mu_Context): mu_Container;
-	public function mu_get_container(ctx: mu_Context, name: String): mu_Container;
-	public function mu_bring_to_front(ctx: mu_Context, cnt: mu_Container): Void;
+	/* core state */
+	var style:Style;
+	var hover:Defs.Id;
+	var focus:Defs.Id;
+	var last_id:Defs.Id;
+	var last_rect:Rect;
+	var last_zindex:Int;
+	var updated_focus:Int;
+	var frame:Int;
+	var hover_root:Container;
+	var next_hover_root:Container;
+	var scroll_target:Container;
+	var number_edit_buf:String;
+	var number_edit:Defs.Id;
+	/* stacks */
+	var command_list:Array<Int>;
+	var root_list:Array<Container>;
+	var container_stack:Array<Container>;
+	var clip_stack:Array<Rect>;
+	var id_stack:Array<Id>;
+	var layout_stack:Array<Layout>;
+	/* retained state pools */
+	var container_pool:Array<PoolItem>;
+	var containers:Array<Container>;
+	var treenode_pool:Array<PoolItem>;
+	/* input state */
+	var mouse_pos:Vec2;
+	var last_mouse_pos:Vec2;
+	var mouse_delta:Vec2;
+	var scroll_delta:Vec2;
+	var mouse_down:Int;
+	var mouse_pressed:Int;
+	var key_down:Int;
+	var key_pressed:Int;
+	var input_text:String;
 
-	public function mu_pool_init(ctx: mu_Context, items: mu_PoolItem, len: Int, id: mu_Id): Int;
-	public function mu_pool_get(ctx: mu_Context, items: mu_PoolItem, len: Int, id: mu_Id): Int;
-	public function mu_pool_update(ctx: mu_Context, items: mu_PoolItem, idx: Int): Void;
+	static function draw_frame_default(ctx:Context, rect:Rect, colorid:Int):Void {
+		#if 0
+		ctx.draw_rect(rect, ctx -> style -> colors[colorid]);
+		if (colorid == MU_COLOR_SCROLLBASE || colorid == MU_COLOR_SCROLLTHUMB || colorid == MU_COLOR_TITLEBG) {
+			return;
+		}
+		/* draw border */
+		if (ctx -> style -> colors[MU_COLOR_BORDER].a) {
+			mu_draw_box(ctx, expand_rect(rect, 1), ctx -> style -> colors[MU_COLOR_BORDER]);
+		}
+		#end
+	}
 
-	public function mu_input_mousemove(ctx: mu_Context, x: Int, y: Int): Void;
-	public function mu_input_mousedown(ctx: mu_Context, x: Int, y: Int, btn: Int): Void;
-	public function mu_input_mouseup(ctx: mu_Context, x: Int, y: Int, btn: Int): Void;
-	public function mu_input_scroll(ctx: mu_Context, x: Int, y: Int): Void;
-	public function mu_input_keydown(ctx: mu_Context, key: Int): Void;
-	public function mu_input_keyup(ctx: mu_Context, key: Int): Void;
-	public function mu_input_text(ctx: mu_Context, text: String): Void;
+	static var default_style:Style = {
+		font: null,
+		size: {x: 68, y: 10},
+		padding: 5,
+		spacing: 4,
+		indent: 24,
+		title_height: 24,
+		scrollbar_size: 12,
+		thumb_size: 8,
+		colors: [
+			{
+				r: 230,
+				g: 230,
+				b: 230,
+				a: 255
+			}, /* MUColor.TEXT */
+			{
+				r: 25,
+				g: 25,
+				b: 25,
+				a: 255
+			}, /* MUColor.BORDER */
+			{
+				r: 50,
+				g: 50,
+				b: 50,
+				a: 255
+			}, /* MUColor.WINDOWBG */
+			{
+				r: 25,
+				g: 25,
+				b: 25,
+				a: 255
+			}, /* MUColor.TITLEBG */
+			{
+				r: 240,
+				g: 240,
+				b: 240,
+				a: 255
+			}, /* MUColor.TITLETEXT */
+			{
+				r: 0,
+				g: 0,
+				b: 0,
+				a: 0
+			}, /* MUColor.PANELBG */
+			{
+				r: 75,
+				g: 75,
+				b: 75,
+				a: 255
+			}, /* MUColor.BUTTON */
+			{
+				r: 95,
+				g: 95,
+				b: 95,
+				a: 255
+			}, /* MUColor.BUTTONHOVER */
+			{
+				r: 115,
+				g: 115,
+				b: 115,
+				a: 255
+			}, /* MUColor.BUTTONFOCUS */
+			{
+				r: 30,
+				g: 30,
+				b: 30,
+				a: 255
+			}, /* MUColor.BASE */
+			{
+				r: 35,
+				g: 35,
+				b: 35,
+				a: 255
+			}, /* MUColor.BASEHOVER */
+			{
+				r: 40,
+				g: 40,
+				b: 40,
+				a: 255
+			}, /* MUColor.BASEFOCUS */
+			{
+				r: 43,
+				g: 43,
+				b: 43,
+				a: 255
+			}, /* MUColor.SCROLLBASE */
+			{
+				r: 30,
+				g: 30,
+				b: 30,
+				a: 255
+			} /* MUColor.SCROLLTHUMB */
+		]
+	}
 
-	public function mu_push_command(ctx: mu_Context, type: Int, size: Int): mu_Command;
-	public function mu_next_command(ctx: mu_Context, cmd: mu_Command): Int;
-	public function mu_set_clip(ctx: mu_Context, rect: mu_Rect): Void;
-	public function mu_draw_rect(ctx: mu_Context, rect: mu_Rect, color: mu_Color): Void;
-	public function mu_draw_box(ctx: mu_Context, rect: mu_Rect, color: mu_Color): Void;
-	public function mu_draw_text(ctx: mu_Context, font: mu_Font, str: String, len: Int, pos: mu_Vec2, color: mu_Color): Void;
-	public function mu_draw_icon(ctx: mu_Context, id: Int, rect: mu_Rect, color: mu_Color): Void;
+	public function init():Void {
+		style = default_style;
+	}
 
-	public function mu_layout_row(ctx: mu_Context, items: Int, widths: Int, height: Int): Void;
-	public function mu_layout_width(ctx: mu_Context, width: Int): Void;
-	public function mu_layout_height(ctx: mu_Context, height: Int): Void;
-	public function mu_layout_begin_column(ctx: mu_Context): Void;
-	public function mu_layout_end_column(ctx: mu_Context): Void;
-	public function mu_layout_set_next(ctx: mu_Context, r: mu_Rect, relative: Int): Void;
-	public function mu_layout_next(ctx: mu_Context): mu_Rect;
+	public function begin():Void {}
 
-	public function mu_draw_control_frame(ctx: mu_Context, id: mu_Id, rect: mu_Rect, colorid: Int, opt: Int): Void;
-	public function mu_draw_control_text(ctx: mu_Context, str: String, rect: mu_Rect, colorid: Int, opt: Int): Void;
-	public function mu_mouse_over(ctx: mu_Context, rect: mu_Rect): Int;
-	public function mu_update_control(ctx: mu_Context, id: mu_Id, rect: mu_Rect, opt: Int): Void;
+	public function end():Void {}
 
-	public function mu_text(ctx: mu_Context, text: String): Void;
-	public function mu_label(ctx: mu_Context, text: String): Void;
-	public function mu_button(ctx: mu_Context, label: String, icon: Int = 0, opt: Int = MU_OPT_ALIGNCENTER): Int;
-	public function mu_checkbox(ctx: mu_Context, label: String, state: Int): Int;
-	public function mu_textbox_raw(ctx: mu_Context, buf: String, bufsz: Int, id: mu_Id, r: mu_Rect, opt: Int): Int; // TODO buf is probably not a string
-	public function mu_textbox(ctx: mu_Context, buf: String, bufsz: Int, opt: Int = 0): Int; // TODO buf is probably not a string
-	public function mu_slider(ctx: mu_Context, value: mu_Real, low: mu_Real, high: mu_Real, step: mu_Real = 0, fmt: String = MU_SLIDER_FMT, opt: Int = MU_OPT_ALIGNCENTER): Int;
-	public function mu_number(ctx: mu_Context, value: mu_Real, step: mu_Real, fmt: String = MU_SLIDER_FMT, opt: Int = MU_OPT_ALIGNCENTER): Int; 
-	public function mu_header(ctx: mu_Context, label: String, opt: Int = 0): Int;
-	public function mu_begin_treenode(ctx: mu_Context, label: String, opt: Int = 0): Int;
-	public function mu_end_treenode(ctx: mu_Context): Void;
-	public function mu_begin_window(ctx: mu_Context, title: String, rect: mu_Rect, opt: Int = 0): Int;
-	public function mu_end_window(ctx: mu_Context): Void;
-	public function mu_open_popup(ctx: mu_Context, name: String): Void;
-	public function mu_begin_popup(ctx: mu_Context, name: String): Int;
-	public function mu_end_popup(ctx: mu_Context): Void;
-	public function mu_begin_panel(ctx: mu_Context, name: String, opt: Int = 0): Void;
-	public function mu_end_panel(ctx: mu_Context): Void;
+	public function set_focus(id:Defs.Id):Void {}
+
+	public function get_id(data:Dynamic, size:Int):Defs.Id {
+		return null;
+	}
+
+	public function push_id(data:Dynamic, size:Int):Void {}
+
+	public function pop_id():Void {}
+
+	public function push_clip_rect(rect:Rect):Void {}
+
+	public function pop_clip_rect():Void {}
+
+	public function get_clip_rect():Rect {
+		return null;
+	}
+
+	public function check_clip(r:Rect):Int {
+		return null;
+	}
+
+	public function get_current_container():Container {
+		return null;
+	}
+
+	public function get_container(name:String):Container {
+		return null;
+	}
+
+	public function bring_to_front(cnt:Container):Void {}
+
+	public function pool_init(items:PoolItem, len:Int, id:Defs.Id):Int {
+		return null;
+	}
+
+	public function pool_get(items:PoolItem, len:Int, id:Defs.Id):Int {
+		return null;
+	}
+
+	public function pool_update(items:PoolItem, idx:Int):Void {}
+
+	public function input_mousemove(x:Int, y:Int):Void {}
+
+	public function input_mousedown(x:Int, y:Int, btn:Int):Void {}
+
+	public function input_mouseup(x:Int, y:Int, btn:Int):Void {}
+
+	public function input_scroll(x:Int, y:Int):Void {}
+
+	public function input_keydown(key:Int):Void {}
+
+	public function input_keyup(key:Int):Void {}
+
+	public function input_text_func(text:String):Void {}
+
+	public function push_command(type:Int, size:Int):Command {
+		return null;
+	}
+
+	public function next_command(cmd:Command):Int {
+		return null;
+	}
+
+	public function set_clip(rect:Rect):Void {}
+
+	public function draw_rect(rect:Rect, color:Color):Void {}
+
+	public function draw_box(rect:Rect, color:Color):Void {}
+
+	public function draw_text(font:Font, str:String, len:Int, pos:Vec2, color:Color):Void {}
+
+	public function draw_icon(id:Int, rect:Rect, color:Color):Void {}
+
+	public function layout_row(items:Int, widths:Int, height:Int):Void {}
+
+	public function layout_width(width:Int):Void {}
+
+	public function layout_height(height:Int):Void {}
+
+	public function layout_begin_column():Void {}
+
+	public function layout_end_column():Void {}
+
+	public function layout_set_next(r:Rect, relative:Int):Void {}
+
+	public function layout_next():Rect {
+		return null;
+	}
+
+	public function draw_control_frame(id:Defs.Id, rect:Rect, colorid:Int, opt:MUOption):Void {}
+
+	public function draw_control_text(str:String, rect:Rect, colorid:Int, opt:MUOption):Void {}
+
+	public function mouse_over(rect:Rect):Int {
+		return null;
+	}
+
+	public function update_control(id:Defs.Id, rect:Rect, opt:MUOption):Void {}
+
+	public function text(text:String):Void {}
+
+	public function label(text:String):Void {}
+
+	public function button(label:String, icon:Int = 0, opt:MUOption = MUOption.ALIGNCENTER):Int {
+		return null;
+	}
+
+	public function checkbox(label:String, state:Int):Int {
+		return null;
+	}
+
+	public function textbox_raw(buf:String, bufsz:Int, id:Defs.Id, r:Rect, opt:MUOption):Int {
+		return null;
+	} // TODO buf is probably not a string
+
+	public function textbox(buf:String, bufsz:Int, opt:MUOption = MUOption.NONE):Int {
+		return null;
+	} // TODO buf is probably not a string
+
+	public function slider(value:Real, low:Real, high:Real, step:Real = 0, fmt:String = Defs.SLIDER_FMT, opt:MUOption = MUOption.ALIGNCENTER):Int {
+		return null;
+	}
+
+	public function number(value:Real, step:Real, fmt:String = Defs.SLIDER_FMT, opt:MUOption = MUOption.ALIGNCENTER):Int {
+		return null;
+	}
+
+	public function header(label:String, opt:MUOption = MUOption.NONE):Int {
+		return null;
+	}
+
+	public function begin_treenode(label:String, opt:MUOption = MUOption.NONE):Int {
+		return null;
+	}
+
+	public function end_treenode():Void {}
+
+	public function begin_window(title:String, rect:Rect, opt:MUOption = MUOption.NONE):Int {
+		return null;
+	}
+
+	public function end_window():Void {}
+
+	public function open_popup(name:String):Void {}
+
+	public function begin_popup(name:String):Int {
+		return null;
+	}
+
+	public function end_popup():Void {}
+
+	public function begin_panel(name:String, opt:MUOption = MUOption.NONE):Void {}
+
+	public function end_panel():Void {}
 }
