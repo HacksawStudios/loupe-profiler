@@ -1,5 +1,6 @@
 package nanoui;
 
+// @todo make unit tests for this
 class Stack<T> {
 	final data:Array<T> = new Array<T>();
 
