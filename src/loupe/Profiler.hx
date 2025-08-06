@@ -51,12 +51,27 @@ class TraceEvent {
 class Profiler {
 	static var _markStack:std.Array<Mark> = new std.Array<Mark>();
 	static var _markRecord:std.Array<Mark> = new std.Array<Mark>();
+	static var _isRecording:Bool = false;
+
+	public static function startProfiling() {
+		_isRecording = true;
+	}
+
+	public static function stopProfiling() {
+		_isRecording = false;
+	}
 
 	public static function profileBlockStart(name:String) {
+		if (!_isRecording)
+			return;
+
 		_markStack.push(new Mark(name, timestamp(), (_markStack.length != 0) ? _markStack[_markStack.length - 1] : null));
 	}
 
 	public static function profileBlockEnd() {
+		if (!_isRecording)
+			return;
+
 		Assert.isFalse(_markStack.length <= 0, "There is no mark to pop. The number of profileBlockStart and profileBlockEnd do not match.");
 
 		var mark:Mark = _markStack.pop();
