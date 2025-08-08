@@ -113,22 +113,18 @@ class Profiler {
 	public static function printMark(mark:Mark, depth:Int = 0) {
 		final indent = StringTools.lpad("", "-", depth);
 		trace(indent + "Mark: " + mark.name + ", Begin: " + mark.timestampBegin + ", End: " + mark.timestampEnd);
-		for (child in mark.children) {
-			printMark(child, depth + 1);
-		}
+		mark.children.each((mark) -> printMark(mark, depth + 1));
 	}
 
 	public static function printMarks() {
-		for (mark in _markRecord) {
-			printMark(mark);
-		}
+		_markRecord.each((mark) -> printMark(mark));
 	}
 
-	static final pid = 0;
-	static final tid = 0;
-	static final cat = "PERF";
-
 	public static function dumpMark(mark:Mark, traceEvents:Array<TraceEvent>) {
+		final pid = 0;
+		final tid = 0;
+		final cat = "PERF";
+
 		traceEvents.push({
 			name: mark.name,
 			cat: cat,
@@ -138,9 +134,7 @@ class Profiler {
 			ts: Std.int(mark.timestampBegin)
 		});
 
-		for (child in mark.children) {
-			dumpMark(child, traceEvents);
-		}
+		mark.children.each((child) -> dumpMark(child, traceEvents));
 
 		traceEvents.push({
 			name: mark.name,
@@ -154,11 +148,7 @@ class Profiler {
 
 	public static function dumpToObject():Dynamic {
 		var traceEvents = new Array<TraceEvent>();
-
-		for (mark in _markRecord) {
-			dumpMark(mark, traceEvents);
-		}
-
+		_markRecord.each((mark) -> dumpMark(mark, traceEvents));
 		return {
 			traceEvents: traceEvents,
 			displayTimeUnit: "ms"
