@@ -161,7 +161,6 @@ class Profiler {
 
 	public static function dumpToJsonFile(filename:String) {
 		var jsonString = dumpToJson();
-		trace(jsonString);
 		#if js
 		var blob = new Blob([jsonString], {type: "application/json"});
 		var url = URL.createObjectURL(blob);
@@ -188,7 +187,6 @@ class Profiler {
 		fields.filter((field:Field) -> field.meta != null && field.meta.find(m -> m.name == ":profile") != null).each((field:Field) -> {
 			switch (field.kind) {
 				case FFun(func):
-					trace(field.name);
 					func.expr = macro {
 						Profiler.profileBlockStart($v{localClass.get().name} + ":" + $v{field.name});
 						try {
