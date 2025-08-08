@@ -49,9 +49,9 @@ class TraceEvent {
 }
 
 class Profiler {
-	static var _markStack:std.Array<Mark> = new std.Array<Mark>();
-	static var _markRecord:std.Array<Mark> = new std.Array<Mark>();
-	static var _isRecording:Bool = false;
+	static var _markStack:std.Array<Mark> = [];
+	static var _markRecord:std.Array<Mark> = [];
+	static var _isRecording = false;
 
 	public static function startProfiling() {
 		_isRecording = true;
@@ -74,7 +74,7 @@ class Profiler {
 
 		Assert.isFalse(_markStack.length <= 0, "There is no mark to pop. The number of profileBlockStart and profileBlockEnd do not match.");
 
-		var mark:Mark = _markStack.pop();
+		var mark = _markStack.pop();
 		mark.timestampEnd = timestamp();
 
 		if (mark.parent == null) {
@@ -113,11 +113,11 @@ class Profiler {
 	public static function printMark(mark:Mark, depth:Int = 0) {
 		final indent = StringTools.lpad("", "-", depth);
 		trace(indent + "Mark: " + mark.name + ", Begin: " + mark.timestampBegin + ", End: " + mark.timestampEnd);
-		mark.children.each((mark) -> printMark(mark, depth + 1));
+		mark.children.each(mark -> printMark(mark, depth + 1));
 	}
 
 	public static function printMarks() {
-		_markRecord.each((mark) -> printMark(mark));
+		_markRecord.each(mark -> printMark(mark));
 	}
 
 	public static function dumpMark(mark:Mark, traceEvents:Array<TraceEvent>) {
@@ -134,7 +134,7 @@ class Profiler {
 			ts: Std.int(mark.timestampBegin)
 		});
 
-		mark.children.each((child) -> dumpMark(child, traceEvents));
+		mark.children.each(child -> dumpMark(child, traceEvents));
 
 		traceEvents.push({
 			name: mark.name,
@@ -148,7 +148,7 @@ class Profiler {
 
 	public static function dumpToObject():Dynamic {
 		var traceEvents = new Array<TraceEvent>();
-		_markRecord.each((mark) -> dumpMark(mark, traceEvents));
+		_markRecord.each(mark -> dumpMark(mark, traceEvents));
 		return {
 			traceEvents: traceEvents,
 			displayTimeUnit: "ms"
@@ -184,7 +184,7 @@ class Profiler {
 		if (localClass == null)
 			return fields;
 
-		fields.filter((field:Field) -> field.meta != null && field.meta.find(m -> m.name == ":profile") != null).each((field:Field) -> {
+		fields.filter(field -> field.meta != null && field.meta.find(m -> m.name == ":profile") != null).each(field -> {
 			switch (field.kind) {
 				case FFun(func):
 					func.expr = macro {
