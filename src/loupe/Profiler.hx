@@ -33,8 +33,9 @@ class Mark {
 		this.timestampBegin = timestampBegin;
 		this.timestampEnd = 0.0;
 
-		if (parent != null)
+		if (parent != null) {
 			parent.children.push(this);
+		}
 	}
 }
 
@@ -183,8 +184,9 @@ class Profiler {
 		var pos = Context.currentPos();
 		var fields = Context.getBuildFields();
 		var localClass = Context.getLocalClass();
-		if (localClass == null)
+		if (localClass == null) {
 			return fields;
+		}
 
 		fields.filter(field -> field.meta != null && field.meta.find(m -> m.name == ':profile') != null).each(field -> {
 			switch field.kind {
