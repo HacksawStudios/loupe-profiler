@@ -129,9 +129,7 @@ class Profiler {
 		final mark = _markStack.pop();
 		mark.timestampEnd = timestamp();
 
-		if (mark.parent == null) {
-			_markRecord.push(mark);
-		}
+		_markRecord.pushIf(mark.parent == null, mark);
 	}
 
 	/**
