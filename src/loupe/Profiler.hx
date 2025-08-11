@@ -186,7 +186,7 @@ class Profiler {
 		@param mark The mark which will be printed
 		@param depth The level of indentation which will be printed
 	**/
-	public static function printMark(mark:Mark, depth:Int = 0) {
+	public static function printMark(mark:Mark, depth = 0) {
 		final indent = StringTools.lpad('', '-', depth);
 		trace(indent + 'Mark: ' + mark.name + ', Begin: ' + mark.timestampBegin + ', End: ' + mark.timestampEnd);
 		mark.children.each(mark -> printMark(mark, depth + 1));
