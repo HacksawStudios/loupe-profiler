@@ -39,7 +39,7 @@ class TestMain extends buddy.SingleSuite {
 
 			Profiler.profileBlockEnd();
 
-			var foo = new Foo();
+			final foo = new Foo();
 			foo.bar(); // Profiled through macro
 
 			Sys.sleep(0.1);
@@ -75,11 +75,13 @@ class TestMain extends buddy.SingleSuite {
 				final hasBlock3Trace = hasTraceEvent(firstProfile, "block3");
 				final hasFooBarTrace = hasTraceEvent(firstProfile, "Foo:bar");
 				final hasBlock2_2Trace = hasTraceEvent(firstProfile, "block2", 1);
+				final hasBlock4Trace = hasTraceEvent(firstProfile, "block4");
 				hasBlock1Trace.should.be(true);
 				hasBlock2Trace.should.be(true);
 				hasBlock3Trace.should.be(true);
 				hasFooBarTrace.should.be(true);
 				hasBlock2_2Trace.should.be(true);
+				hasBlock4Trace.should.be(false);
 			});
 
 			Profiler.stopProfiling();
@@ -98,8 +100,6 @@ class TestMain extends buddy.SingleSuite {
 	}
 
 	function hasTraceEvent(object:Dynamic, name:String, skip:Int = 0, ph:String = "B"):Bool {
-		if (object.traceEvents.filter((event) -> event.name == name && event.ph == ph).length > skip)
-			return true;
-		return false;
+		return object.traceEvents.filter((event) -> event.name == name && event.ph == ph).length > skip;
 	}
 }
