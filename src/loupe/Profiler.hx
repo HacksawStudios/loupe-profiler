@@ -18,11 +18,11 @@ import sys.io.File;
 #end
 
 class Mark {
-	public var name:String;
-	public var parent:Null<Mark>;
-	public var children:Array<Mark>;
+	public final name:String;
+	public final parent:Null<Mark>;
+	public final children:Array<Mark>;
 
-	public var timestampBegin:Float;
+	public final timestampBegin:Float;
 	public var timestampEnd:Float;
 
 	public function new(name:String, timestampBegin:Float, parent:Null<Mark> = null) {
@@ -56,6 +56,8 @@ class Profiler {
 
 	public static function startProfiling() {
 		_isRecording = true;
+		_markStack = [];
+		_markRecord = [];
 	}
 
 	public static function stopProfiling() {
