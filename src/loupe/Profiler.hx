@@ -59,8 +59,8 @@ class TraceEvent {
 	An instrumentation-based profiler
 **/
 class Profiler {
-	static var _markStack:Array<Mark> = [];
-	static var _markRecord:Array<Mark> = [];
+	static final _markStack:Array<Mark> = [];
+	static final _markRecord:Array<Mark> = [];
 	static var _isRecording = false;
 
 	/**
@@ -73,8 +73,8 @@ class Profiler {
 	**/
 	public static function startProfiling() {
 		_isRecording = true;
-		_markStack = [];
-		_markRecord = [];
+		_markStack.resize(0);
+		_markRecord.resize(0);
 	}
 
 	/**
