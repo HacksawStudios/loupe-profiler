@@ -57,6 +57,61 @@ class TraceEvent {
 
 /**
 	An instrumentation-based profiler. Go to the README for usage examples
+
+	@example Enable profiling
+	```haxe
+	Profiler.startProfiling(); // Profiling is disabled by default, so you must always do this once before starting to call the profiling functions or they won't be recorded.
+	```
+
+	@example Disable profiling
+	```haxe
+	Profiler.stopProfiling();
+	```
+
+	@example Profile block start/end
+	```haxe
+	Profiler.profileBlockStart("block1");
+	// Work you want to profile
+	Profiler.profileBlockEnd();
+	```
+
+	@example Profile block
+	```haxe
+	Profiler.profileBlock("block3", {
+		// Work you want to profile
+	});
+	```
+
+	@example Profile function
+	```haxe
+	@:build(hacksaw.profiler.Profiler.injectProfiler())
+	class Foo {
+		@:profile
+		public function bar() {
+			// Work you want to profile
+		}
+	}
+	```
+
+	@example Dumping profile to json file
+	```haxe
+	Profiler.profileBlockStart("block2");
+	// Work you want profile
+	Profiler.profileBlockEnd();
+
+	Profiler.dumpToJsonFile("profile_dump.json");
+	```
+
+	@example Print generated json
+	```haxe
+	Profiler.profileBlockStart("block2");
+	// Work you want profile
+	Profiler.profileBlockEnd();
+
+	trace(Profiler.dumpToJson());
+	```
+
+	You can then open up [chrome://tracing](chrome://tracing) or https://www.speedscope.app/ to view the profile and inspect it.
 **/
 class Profiler {
 	static var _markStack:Array<Mark> = [];
