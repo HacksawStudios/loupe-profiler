@@ -126,7 +126,7 @@ class Profiler {
 
 		Assert.isFalse(_markStack.length <= 0, 'There is no mark to pop. The number of profileBlockStart and profileBlockEnd do not match.');
 
-		var mark = _markStack.pop();
+		final mark = _markStack.pop();
 		mark.timestampEnd = timestamp();
 
 		if (mark.parent == null) {
