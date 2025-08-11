@@ -148,7 +148,7 @@ class Profiler {
 		```
 	**/
 	macro public static function profileBlock(name:String, expr:Expr):Expr {
-		var body = switch expr.expr {
+		final body = switch expr.expr {
 			case EBlock(_):
 				expr;
 			case _:
@@ -237,7 +237,7 @@ class Profiler {
 		@return The dumped recorded profile as a dynamic object
 	**/
 	public static function dumpToObject():Dynamic {
-		var traceEvents:Array<TraceEvent> = [];
+		final traceEvents:Array<TraceEvent> = [];
 		_markRecord.each(mark -> dumpMark(mark, traceEvents));
 		return {
 			traceEvents: traceEvents,
@@ -278,11 +278,11 @@ class Profiler {
 		```
 	**/
 	public static function dumpToJsonFile(filename:String) {
-		var jsonString = dumpToJson();
+		final jsonString = dumpToJson();
 		#if js
-		var blob = new Blob([jsonString], {type: 'application/json'});
-		var url = URL.createObjectURL(blob);
-		var link:AnchorElement = cast Browser.document.createAnchorElement();
+		final blob = new Blob([jsonString], {type: 'application/json'});
+		final url = URL.createObjectURL(blob);
+		final link:AnchorElement = cast Browser.document.createAnchorElement();
 		link.href = url;
 		link.download = filename;
 		Browser.document.body.appendChild(link);
@@ -312,9 +312,9 @@ class Profiler {
 		```
 	**/
 	macro public static function injectProfiler():Array<Field> {
-		var pos = Context.currentPos();
-		var fields = Context.getBuildFields();
-		var localClass = Context.getLocalClass();
+		final pos = Context.currentPos();
+		final fields = Context.getBuildFields();
+		final localClass = Context.getLocalClass();
 		if (localClass == null) {
 			return fields;
 		}
