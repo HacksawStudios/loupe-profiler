@@ -17,6 +17,9 @@ import haxe.Timer;
 import sys.io.File;
 #end
 
+/**
+	Represents a performance profiling mark
+**/
 class Mark {
 	public final name:String;
 	public final parent:Null<Mark>;
@@ -39,6 +42,9 @@ class Mark {
 	}
 }
 
+/**
+	Helper class for Googles TraceEvent json format: https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/
+**/
 @:structInit
 class TraceEvent {
 	public var name:String;
@@ -49,21 +55,33 @@ class TraceEvent {
 	public var ts:Int;
 }
 
+/**
+	An instrumentation-based profiler. Go to the README for usage examples
+**/
 class Profiler {
 	static var _markStack:Array<Mark> = [];
 	static var _markRecord:Array<Mark> = [];
 	static var _isRecording = false;
 
+	/**
+		Starts recording a profile
+	**/
 	public static function startProfiling() {
 		_isRecording = true;
 		_markStack = [];
 		_markRecord = [];
 	}
 
+	/**
+		Stops recording a profile
+	**/
 	public static function stopProfiling() {
 		_isRecording = false;
 	}
 
+	/**
+		Starts a profile block
+	**/
 	public static function profileBlockStart(name:String) {
 		if (!_isRecording) {
 			return;
@@ -72,6 +90,9 @@ class Profiler {
 		_markStack.push(new Mark(name, timestamp(), (_markStack.length != 0) ? _markStack[_markStack.length - 1] : null));
 	}
 
+	/**
+		Ends a profile block
+	**/
 	public static function profileBlockEnd() {
 		if (!_isRecording) {
 			return;
@@ -87,6 +108,12 @@ class Profiler {
 		}
 	}
 
+	/**
+		Profiles a code block
+
+		@param mark The mark which will be dumped
+		@param outTraceEvents The output array
+	**/
 	macro public static function profileBlock(name:String, expr:Expr):Expr {
 		var body = switch expr.expr {
 			case EBlock(_):
@@ -107,6 +134,11 @@ class Profiler {
 		}
 	}
 
+	/**
+		Gets a timestamp
+
+		@return The timestamp
+	**/
 	inline public static function timestamp():Float {
 		#if js
 		return Browser.window.performance.now();
@@ -115,22 +147,37 @@ class Profiler {
 		#end
 	}
 
+	/**
+		Prints the recorded mark
+
+		@param mark The mark which will be printed
+		@param depth The level of indentation which will be printed
+	**/
 	public static function printMark(mark:Mark, depth:Int = 0) {
 		final indent = StringTools.lpad('', '-', depth);
 		trace(indent + 'Mark: ' + mark.name + ', Begin: ' + mark.timestampBegin + ', End: ' + mark.timestampEnd);
 		mark.children.each(mark -> printMark(mark, depth + 1));
 	}
 
+	/**
+		Prints the recorded marks
+	**/
 	public static function printMarks() {
 		_markRecord.each(mark -> printMark(mark));
 	}
 
-	public static function dumpMark(mark:Mark, traceEvents:Array<TraceEvent>) {
+	/**
+		Dumps the recorded mark into a TraceEvent array
+
+		@param mark The mark which will be dumped
+		@param outTraceEvents The output array
+	**/
+	public static function dumpMark(mark:Mark, outTraceEvents:Array<TraceEvent>) {
 		final pid = 0;
 		final tid = 0;
 		final cat = 'PERF';
 
-		traceEvents.push({
+		outTraceEvents.push({
 			name: mark.name,
 			cat: cat,
 			ph: 'B',
@@ -139,9 +186,9 @@ class Profiler {
 			ts: Std.int(mark.timestampBegin)
 		});
 
-		mark.children.each(child -> dumpMark(child, traceEvents));
+		mark.children.each(child -> dumpMark(child, outTraceEvents));
 
-		traceEvents.push({
+		outTraceEvents.push({
 			name: mark.name,
 			cat: cat,
 			ph: 'E',
@@ -151,6 +198,9 @@ class Profiler {
 		});
 	}
 
+	/**
+		Dumps the recorded profile to a dynamic object
+	**/
 	public static function dumpToObject():Dynamic {
 		var traceEvents:Array<TraceEvent> = [];
 		_markRecord.each(mark -> dumpMark(mark, traceEvents));
@@ -160,10 +210,18 @@ class Profiler {
 		};
 	}
 
+	/**
+		Dumps the recorded profile to a json string
+	**/
 	public static function dumpToJson():String {
 		return Json.stringify(dumpToObject());
 	}
 
+	/**
+		Dumps the recorded profile to a json file
+
+		@param filename The filename for the profile, including json extension
+	**/
 	public static function dumpToJsonFile(filename:String) {
 		var jsonString = dumpToJson();
 		#if js
@@ -182,6 +240,11 @@ class Profiler {
 		trace('Profiler data saved.');
 	}
 
+	/**
+		Injects the profiler macro into a class, is required for the @:profile macro
+
+		@return Modified class fields
+	**/
 	macro public static function injectProfiler():Array<Field> {
 		var pos = Context.currentPos();
 		var fields = Context.getBuildFields();
