@@ -192,7 +192,7 @@ class Profiler {
 			switch field.kind {
 				case FFun(func):
 					func.expr = macro {
-						Profiler.profileBlockStart($v{localClass.get().name} + ':' + $v{field.name});
+						Profiler.profileBlockStart($v{'${localClass.get().name}:${field.name}'});
 						try {
 							${func.expr};
 						} catch (e:Dynamic) {
