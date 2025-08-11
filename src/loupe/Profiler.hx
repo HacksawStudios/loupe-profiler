@@ -47,12 +47,12 @@ class Mark {
 **/
 @:structInit
 class TraceEvent {
-	public var name:String;
-	public var cat:String;
-	public var ph:String;
-	public var pid:Int;
-	public var tid:Int;
-	public var ts:Int;
+	public final name:String;
+	public final cat:String;
+	public final ph:String;
+	public final pid:Int;
+	public final tid:Int;
+	public final ts:Int;
 }
 
 /**
