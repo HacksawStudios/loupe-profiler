@@ -92,6 +92,8 @@ class Profiler {
 	/**
 		Starts a profile block
 
+		@param name The name of the profiled block
+
 		@example
 		```haxe
 		Profiler.profileBlockStart("block1");
@@ -136,7 +138,9 @@ class Profiler {
 		Profiles a code block
 
 		@param mark The mark which will be dumped
-		@param outTraceEvents The output array
+		@param expr The code block that will be profiled
+
+		@return The modified AST
 
 		@example
 		```haxe
@@ -231,6 +235,8 @@ class Profiler {
 
 	/**
 		Dumps the recorded profile to a dynamic object
+
+		@return The dumped recorded profile as a dynamic object
 	**/
 	public static function dumpToObject():Dynamic {
 		var traceEvents:Array<TraceEvent> = [];
@@ -243,6 +249,8 @@ class Profiler {
 
 	/**
 		Dumps the recorded profile to a json string
+
+		@return The dumped recorded profile as a json string
 
 		@example
 		```haxe
