@@ -28,7 +28,7 @@ class Mark {
 	public final timestampBegin:Float;
 	public var timestampEnd:Float;
 
-	public function new(name:String, timestampBegin:Float, parent:Null<Mark> = null) {
+	public function new(name:String, timestampBegin:Float, ?parent:Null<Mark>) {
 		this.name = name;
 		this.parent = parent;
 		this.children = [];
