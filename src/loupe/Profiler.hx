@@ -20,7 +20,7 @@ import sys.io.File;
 class Mark {
 	public var name:String;
 	public var parent:Null<Mark>;
-	public var children:std.Array<Mark>;
+	public var children:Array<Mark>;
 
 	public var timestampBegin:Float;
 	public var timestampEnd:Float;
@@ -28,7 +28,7 @@ class Mark {
 	public function new(name:String, timestampBegin:Float, parent:Null<Mark> = null) {
 		this.name = name;
 		this.parent = parent;
-		this.children = new std.Array<Mark>();
+		this.children = [];
 
 		this.timestampBegin = timestampBegin;
 		this.timestampEnd = 0.0;
@@ -49,8 +49,8 @@ class TraceEvent {
 }
 
 class Profiler {
-	static var _markStack:std.Array<Mark> = [];
-	static var _markRecord:std.Array<Mark> = [];
+	static var _markStack:Array<Mark> = [];
+	static var _markRecord:Array<Mark> = [];
 	static var _isRecording = false;
 
 	public static function startProfiling() {
@@ -62,17 +62,19 @@ class Profiler {
 	}
 
 	public static function profileBlockStart(name:String) {
-		if (!_isRecording)
+		if (!_isRecording) {
 			return;
+		}
 
 		_markStack.push(new Mark(name, timestamp(), (_markStack.length != 0) ? _markStack[_markStack.length - 1] : null));
 	}
 
 	public static function profileBlockEnd() {
-		if (!_isRecording)
+		if (!_isRecording) {
 			return;
+		}
 
-		Assert.isFalse(_markStack.length <= 0, "There is no mark to pop. The number of profileBlockStart and profileBlockEnd do not match.");
+		Assert.isFalse(_markStack.length <= 0, 'There is no mark to pop. The number of profileBlockStart and profileBlockEnd do not match.');
 
 		var mark = _markStack.pop();
 		mark.timestampEnd = timestamp();
@@ -83,7 +85,7 @@ class Profiler {
 	}
 
 	macro public static function profileBlock(name:String, expr:Expr):Expr {
-		var body = switch (expr.expr) {
+		var body = switch expr.expr {
 			case EBlock(_):
 				expr;
 			case _:
@@ -111,8 +113,8 @@ class Profiler {
 	}
 
 	public static function printMark(mark:Mark, depth:Int = 0) {
-		final indent = StringTools.lpad("", "-", depth);
-		trace(indent + "Mark: " + mark.name + ", Begin: " + mark.timestampBegin + ", End: " + mark.timestampEnd);
+		final indent = StringTools.lpad('', '-', depth);
+		trace(indent + 'Mark: ' + mark.name + ', Begin: ' + mark.timestampBegin + ', End: ' + mark.timestampEnd);
 		mark.children.each(mark -> printMark(mark, depth + 1));
 	}
 
@@ -123,12 +125,12 @@ class Profiler {
 	public static function dumpMark(mark:Mark, traceEvents:Array<TraceEvent>) {
 		final pid = 0;
 		final tid = 0;
-		final cat = "PERF";
+		final cat = 'PERF';
 
 		traceEvents.push({
 			name: mark.name,
 			cat: cat,
-			ph: "B",
+			ph: 'B',
 			pid: pid,
 			tid: tid,
 			ts: Std.int(mark.timestampBegin)
@@ -139,7 +141,7 @@ class Profiler {
 		traceEvents.push({
 			name: mark.name,
 			cat: cat,
-			ph: "E",
+			ph: 'E',
 			pid: pid,
 			tid: tid,
 			ts: Std.int(mark.timestampEnd)
@@ -147,11 +149,11 @@ class Profiler {
 	}
 
 	public static function dumpToObject():Dynamic {
-		var traceEvents = new Array<TraceEvent>();
+		var traceEvents:Array<TraceEvent> = [];
 		_markRecord.each(mark -> dumpMark(mark, traceEvents));
 		return {
 			traceEvents: traceEvents,
-			displayTimeUnit: "ms"
+			displayTimeUnit: 'ms'
 		};
 	}
 
@@ -162,7 +164,7 @@ class Profiler {
 	public static function dumpToJsonFile(filename:String) {
 		var jsonString = dumpToJson();
 		#if js
-		var blob = new Blob([jsonString], {type: "application/json"});
+		var blob = new Blob([jsonString], {type: 'application/json'});
 		var url = URL.createObjectURL(blob);
 		var link:AnchorElement = cast Browser.document.createAnchorElement();
 		link.href = url;
@@ -174,7 +176,7 @@ class Profiler {
 		#else
 		File.saveContent(filename, jsonString);
 		#end
-		trace("Profiler data saved.");
+		trace('Profiler data saved.');
 	}
 
 	macro public static function injectProfiler():Array<Field> {
@@ -184,11 +186,11 @@ class Profiler {
 		if (localClass == null)
 			return fields;
 
-		fields.filter(field -> field.meta != null && field.meta.find(m -> m.name == ":profile") != null).each(field -> {
-			switch (field.kind) {
+		fields.filter(field -> field.meta != null && field.meta.find(m -> m.name == ':profile') != null).each(field -> {
+			switch field.kind {
 				case FFun(func):
 					func.expr = macro {
-						Profiler.profileBlockStart($v{localClass.get().name} + ":" + $v{field.name});
+						Profiler.profileBlockStart($v{localClass.get().name} + ':' + $v{field.name});
 						try {
 							${func.expr};
 						} catch (e:Dynamic) {
@@ -199,7 +201,7 @@ class Profiler {
 					}
 					field.kind = FFun(func);
 				default:
-					Context.error("Cannot mark non-function field as :profile!", Context.currentPos());
+					Context.error('Cannot mark non-function field as :profile!', Context.currentPos());
 			}
 		});
 
