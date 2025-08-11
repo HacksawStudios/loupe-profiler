@@ -56,62 +56,7 @@ class TraceEvent {
 }
 
 /**
-	An instrumentation-based profiler. Go to the README for usage examples
-
-	@example Enable profiling
-	```haxe
-	Profiler.startProfiling(); // Profiling is disabled by default, so you must always do this once before starting to call the profiling functions or they won't be recorded.
-	```
-
-	@example Disable profiling
-	```haxe
-	Profiler.stopProfiling();
-	```
-
-	@example Profile block start/end
-	```haxe
-	Profiler.profileBlockStart("block1");
-	// Work you want to profile
-	Profiler.profileBlockEnd();
-	```
-
-	@example Profile block
-	```haxe
-	Profiler.profileBlock("block3", {
-		// Work you want to profile
-	});
-	```
-
-	@example Profile function
-	```haxe
-	@:build(hacksaw.profiler.Profiler.injectProfiler())
-	class Foo {
-		@:profile
-		public function bar() {
-			// Work you want to profile
-		}
-	}
-	```
-
-	@example Dumping profile to json file
-	```haxe
-	Profiler.profileBlockStart("block2");
-	// Work you want profile
-	Profiler.profileBlockEnd();
-
-	Profiler.dumpToJsonFile("profile_dump.json");
-	```
-
-	@example Print generated json
-	```haxe
-	Profiler.profileBlockStart("block2");
-	// Work you want profile
-	Profiler.profileBlockEnd();
-
-	trace(Profiler.dumpToJson());
-	```
-
-	You can then open up [chrome://tracing](chrome://tracing) or https://www.speedscope.app/ to view the profile and inspect it.
+	An instrumentation-based profiler
 **/
 class Profiler {
 	static var _markStack:Array<Mark> = [];
@@ -120,6 +65,11 @@ class Profiler {
 
 	/**
 		Starts recording a profile
+
+		@example
+		```haxe
+		Profiler.startProfiling(); // Profiling is disabled by default, so you must always do this once before starting to call the profiling functions or they won't be recorded.
+		```
 	**/
 	public static function startProfiling() {
 		_isRecording = true;
@@ -129,6 +79,11 @@ class Profiler {
 
 	/**
 		Stops recording a profile
+
+		@example
+		```haxe
+		Profiler.stopProfiling();
+		```
 	**/
 	public static function stopProfiling() {
 		_isRecording = false;
@@ -136,6 +91,13 @@ class Profiler {
 
 	/**
 		Starts a profile block
+
+		@example
+		```haxe
+		Profiler.profileBlockStart("block1");
+		// Work you want to profile
+		Profiler.profileBlockEnd();
+		```
 	**/
 	public static function profileBlockStart(name:String) {
 		if (!_isRecording) {
@@ -147,6 +109,13 @@ class Profiler {
 
 	/**
 		Ends a profile block
+
+		@example
+		```haxe
+		Profiler.profileBlockStart("block1");
+		// Work you want to profile
+		Profiler.profileBlockEnd();
+		```
 	**/
 	public static function profileBlockEnd() {
 		if (!_isRecording) {
@@ -168,6 +137,13 @@ class Profiler {
 
 		@param mark The mark which will be dumped
 		@param outTraceEvents The output array
+
+		@example
+		```haxe
+		Profiler.profileBlock("block3", {
+			// Work you want to profile
+		});
+		```
 	**/
 	macro public static function profileBlock(name:String, expr:Expr):Expr {
 		var body = switch expr.expr {
@@ -267,6 +243,15 @@ class Profiler {
 
 	/**
 		Dumps the recorded profile to a json string
+
+		@example
+		```haxe
+		Profiler.profileBlockStart("block2");
+		// Work you want profile
+		Profiler.profileBlockEnd();
+
+		trace(Profiler.dumpToJson());
+		```
 	**/
 	public static function dumpToJson():String {
 		return Json.stringify(dumpToObject());
@@ -276,6 +261,15 @@ class Profiler {
 		Dumps the recorded profile to a json file
 
 		@param filename The filename for the profile, including json extension
+
+		@example
+		```haxe
+		Profiler.profileBlockStart("block2");
+		// Work you want profile
+		Profiler.profileBlockEnd();
+
+		Profiler.dumpToJsonFile("profile_dump.json");
+		```
 	**/
 	public static function dumpToJsonFile(filename:String) {
 		var jsonString = dumpToJson();
@@ -299,6 +293,17 @@ class Profiler {
 		Injects the profiler macro into a class, is required for the @:profile macro
 
 		@return Modified class fields
+
+		@example
+		```haxe
+		@:build(hacksaw.profiler.Profiler.injectProfiler())
+		class Foo {
+			@:profile
+			public function bar() {
+				// Work you want to profile
+			}
+		}
+		```
 	**/
 	macro public static function injectProfiler():Array<Field> {
 		var pos = Context.currentPos();
