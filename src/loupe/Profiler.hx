@@ -4,6 +4,7 @@ import haxe.Json;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import thx.Assert;
+import thx.Floats;
 
 using thx.Arrays;
 
@@ -189,7 +190,7 @@ class Profiler {
 	**/
 	public static function printMark(mark:Mark, depth = 0) {
 		final indent = StringTools.lpad('', '-', depth);
-		trace('${indent}Mark: ${mark.name}, Begin: ${mark.timestampBegin}, End: ${mark.timestampEnd}');
+		trace('${indent}Mark: ${mark.name}, Duration: ${Floats.roundTo(mark.timestampEnd - mark.timestampBegin, 3)}ms');
 		mark.children.each(mark -> printMark(mark, depth + 1));
 	}
 
