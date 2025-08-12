@@ -180,6 +180,7 @@ class Profiler {
 		#end
 	}
 
+	#if debug
 	/**
 		Prints the recorded mark
 
@@ -188,7 +189,7 @@ class Profiler {
 	**/
 	public static function printMark(mark:Mark, depth = 0) {
 		final indent = StringTools.lpad('', '-', depth);
-		trace(indent + 'Mark: ' + mark.name + ', Begin: ' + mark.timestampBegin + ', End: ' + mark.timestampEnd);
+		trace('${indent}Mark: ${mark.name}, Begin: ${mark.timestampBegin}, End: ${mark.timestampEnd}');
 		mark.children.each(mark -> printMark(mark, depth + 1));
 	}
 
@@ -198,6 +199,7 @@ class Profiler {
 	public static function printMarks() {
 		_markRecord.each(mark -> printMark(mark));
 	}
+	#end
 
 	/**
 		Dumps the recorded mark into a TraceEvent array
