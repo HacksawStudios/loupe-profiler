@@ -56,6 +56,13 @@ class TraceEvent {
 	public final ts:Float;
 }
 
+enum OutputSetting {
+	OutputNone;
+	OutputJson(path:String);
+	OutputJsonTrace;
+	OutputTrace;
+}
+
 /**
 	An instrumentation-based profiler
 **/
@@ -63,19 +70,23 @@ class Profiler {
 	static final _markStack:Array<Mark> = [];
 	static final _markRecord:Array<Mark> = [];
 	static var _isRecording = false;
+	static var _outputSetting = OutputSetting.OutputNone;
 
 	/**
 		Starts recording a profile
+
+		@param outputSetting The settings for automatic output, defaults to no output.
 
 		@example
 		```haxe
 		Profiler.startProfiling(); // Profiling is disabled by default, so you must always do this once before starting to call the profiling functions or they won't be recorded.
 		```
 	**/
-	public static function startProfiling() {
+	public static function startProfiling(outputSetting = OutputSetting.OutputNone) {
 		_isRecording = true;
 		_markStack.resize(0);
 		_markRecord.resize(0);
+		_outputSetting = outputSetting;
 	}
 
 	/**
@@ -83,11 +94,24 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.stopProfiling();
+		Profiler.startProfiling(OutputSetting.Json("profile.json"));
+		Profiler.profileBlockStart("block1");
+		// Work you want to profile
+		Profiler.profileBlockEnd();
+		Profiler.stopProfiling(); // Will create a profile.json which can be loaded in a profile viewer.
 		```
 	**/
 	public static function stopProfiling() {
 		_isRecording = false;
+		switch _outputSetting {
+			case OutputNone:
+			case OutputJson(path):
+				dumpToJsonFile(path);
+			case OutputJsonTrace:
+				trace(dumpToJson());
+			case OutputTrace:
+				printMarks();
+		}
 	}
 
 	/**
@@ -181,7 +205,6 @@ class Profiler {
 		#end
 	}
 
-	#if debug
 	/**
 		Prints the recorded mark
 
@@ -209,7 +232,6 @@ class Profiler {
 	public static function printMarks() {
 		_markRecord.each(mark -> printMark(mark));
 	}
-	#end
 
 	/**
 		Dumps the recorded mark into a TraceEvent array

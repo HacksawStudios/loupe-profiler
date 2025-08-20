@@ -2,6 +2,7 @@ package;
 
 import buddy.*;
 import haxe.Timer;
+import loupe.Profiler.OutputSetting;
 import loupe.Profiler;
 
 using buddy.Should;
@@ -26,7 +27,7 @@ class TestMain extends buddy.SingleSuite {
 			Sys.sleep(0.1);
 			Profiler.profileBlockEnd();
 
-			Profiler.startProfiling();
+			Profiler.startProfiling(OutputSetting.OutputTrace);
 			Profiler.profileBlockStart("block1");
 			Sys.sleep(0.1);
 
@@ -55,7 +56,6 @@ class TestMain extends buddy.SingleSuite {
 			Profiler.profileBlockEnd();
 
 			firstProfile = Profiler.dumpToObject();
-			Profiler.printMarks();
 
 			it("firstProfile should have the displayTimeUnit ms", {
 				firstProfile.displayTimeUnit.should.be("ms");
