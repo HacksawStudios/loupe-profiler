@@ -57,9 +57,26 @@ class TraceEvent {
 }
 
 enum OutputSetting {
+	/**
+		Disables automatic output.
+	**/
 	OutputNone;
-	OutputJson(path:String);
+
+	/**
+		Automatically outputs a json file during stopProfiling().
+
+		@param filename Name of the file that will be generated, including the .json file extension.
+	**/
+	OutputJson(filename:String);
+
+	/**
+		Automatically outputs traces the json output to console.
+	**/
 	OutputJsonTrace;
+
+	/**
+		Automatically outputs traces the profile to console in a more readable format.
+	**/
 	OutputTrace;
 }
 
@@ -105,8 +122,8 @@ class Profiler {
 		_isRecording = false;
 		switch _outputSetting {
 			case OutputNone:
-			case OutputJson(path):
-				dumpToJsonFile(path);
+			case OutputJson(filename):
+				dumpToJsonFile(filename);
 			case OutputJsonTrace:
 				trace(dumpToJson());
 			case OutputTrace:
