@@ -96,7 +96,11 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.startProfiling(); // Profiling is disabled by default, so you must always do this once before starting to call the profiling functions or they won't be recorded.
+		Profiler.startProfiling(OutputSetting.OutputTrace); // Profiling is disabled by default, so you must always do this once before starting to call the profiling functions or they won't be recorded.
+		Profiler.profileBlockStart('block1');
+		// Work you want to profile
+		Profiler.profileBlockEnd();
+		Profiler.stopProfiling(); // Will trace the recorded data thanks to passing OutputSetting.OutputTrace in startProfiling.
 		```
 	**/
 	public static function startProfiling(outputSetting = OutputSetting.OutputNone) {
