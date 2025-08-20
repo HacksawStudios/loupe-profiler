@@ -48,13 +48,11 @@ class TestMain extends buddy.SingleSuite {
 			Sys.sleep(0.1);
 			Profiler.profileBlockEnd();
 			Profiler.profileBlockEnd();
-
 			Profiler.stopProfiling();
 
 			Profiler.profileBlockStart("ignoredBlock2");
 			Sys.sleep(0.1);
 			Profiler.profileBlockEnd();
-			Profiler.stopProfiling();
 
 			firstProfile = Profiler.dumpToObject();
 			Profiler.printMarks();
@@ -84,7 +82,6 @@ class TestMain extends buddy.SingleSuite {
 				hasBlock4Trace.should.be(false);
 			});
 
-			Profiler.stopProfiling();
 			Profiler.startProfiling();
 			Profiler.profileBlockStart("block1");
 			Sys.sleep(0.1);
