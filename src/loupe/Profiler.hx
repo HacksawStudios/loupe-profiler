@@ -53,7 +53,7 @@ class TraceEvent {
 	public final ph:String;
 	public final pid:Int;
 	public final tid:Int;
-	public final ts:Int;
+	public final ts:Float;
 }
 
 /**
@@ -177,7 +177,7 @@ class Profiler {
 		#if js
 		return Browser.window.performance.now();
 		#else
-		return Timer.stamp() * 1000.0 * 1000.0;
+		return Timer.stamp() * 1000.0;
 		#end
 	}
 
@@ -219,7 +219,11 @@ class Profiler {
 			ph: 'B',
 			pid: pid,
 			tid: tid,
-			ts: Std.int(mark.timestampBegin)
+			#if js
+			ts: mark.timestampBegin * 1000.0
+			#else
+			ts: mark.timestampBegin * 1000.0
+			#end
 		});
 
 		mark.children.each(child -> dumpMark(child, outTraceEvents));
@@ -230,7 +234,11 @@ class Profiler {
 			ph: 'E',
 			pid: pid,
 			tid: tid,
-			ts: Std.int(mark.timestampEnd)
+			#if js
+			ts: mark.timestampEnd * 1000.0
+			#else
+			ts: mark.timestampEnd * 1000.0
+			#end
 		});
 	}
 
