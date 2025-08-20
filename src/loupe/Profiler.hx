@@ -70,12 +70,12 @@ enum OutputSetting {
 	OutputJson(filename:String);
 
 	/**
-		Automatically outputs traces the json output to console.
+		Automatically traces the json output to console.
 	**/
 	OutputJsonTrace;
 
 	/**
-		Automatically outputs traces the profile to console in a more readable format.
+		Automatically traces the profile to console in a more readable format.
 	**/
 	OutputTrace;
 }
