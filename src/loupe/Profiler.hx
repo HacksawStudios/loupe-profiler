@@ -196,6 +196,15 @@ class Profiler {
 
 	/**
 		Prints the recorded marks
+
+		@example
+		```haxe
+		Profiler.profileBlockStart("block2");
+		// Work you want profile
+		Profiler.profileBlockEnd();
+
+		Profiler.printMarks();
+		```
 	**/
 	public static function printMarks() {
 		_markRecord.each(mark -> printMark(mark));
