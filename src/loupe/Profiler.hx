@@ -111,8 +111,8 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.startProfiling(OutputSetting.Json("profile.json"));
-		Profiler.profileBlockStart("block1");
+		Profiler.startProfiling(OutputSetting.Json('profile.json'));
+		Profiler.profileBlockStart('block1');
 		// Work you want to profile
 		Profiler.profileBlockEnd();
 		Profiler.stopProfiling(); // Will create a profile.json which can be loaded in a profile viewer.
@@ -138,7 +138,7 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.profileBlockStart("block1");
+		Profiler.profileBlockStart('block1');
 		// Work you want to profile
 		Profiler.profileBlockEnd();
 		```
@@ -156,7 +156,7 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.profileBlockStart("block1");
+		Profiler.profileBlockStart('block1');
 		// Work you want to profile
 		Profiler.profileBlockEnd();
 		```
@@ -184,7 +184,7 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.profileBlock("block3", {
+		Profiler.profileBlock('block3', {
 			// Work you want to profile
 		});
 		```
@@ -239,7 +239,7 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.profileBlockStart("block2");
+		Profiler.profileBlockStart('block2');
 		// Work you want profile
 		Profiler.profileBlockEnd();
 
@@ -311,7 +311,7 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.profileBlockStart("block2");
+		Profiler.profileBlockStart('block2');
 		// Work you want profile
 		Profiler.profileBlockEnd();
 
@@ -329,11 +329,11 @@ class Profiler {
 
 		@example
 		```haxe
-		Profiler.profileBlockStart("block2");
+		Profiler.profileBlockStart('block2');
 		// Work you want profile
 		Profiler.profileBlockEnd();
 
-		Profiler.dumpToJsonFile("profile_dump.json");
+		Profiler.dumpToJsonFile('profile_dump.json');
 		```
 	**/
 	public static function dumpToJsonFile(filename:String) {
