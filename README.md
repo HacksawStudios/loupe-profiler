@@ -3,27 +3,27 @@ A simple instrumentation-based profiler.
 
 ## Usage
 ### Enable profiling
-```hx
+```haxe
 Profiler.startProfiling(); // Profiling is disabled by default, so you must always do this once before starting to call the profiling functions or they won't be recorded.
 ```
 ### Disable profiling
-```hx
+```haxe
 Profiler.stopProfiling();
 ```
 ### Profile block start/end
-```hx
+```haxe
 Profiler.profileBlockStart("block1");
 // Work you want to profile
 Profiler.profileBlockEnd();
 ```
 ### Profile block
-```hx
+```haxe
 Profiler.profileBlock("block3", {
     // Work you want to profile
 });
 ```
 ### Profile function
-```hx
+```haxe
 @:build(hacksaw.profiler.Profiler.injectProfiler())
 class Foo {
     @:profile
@@ -33,7 +33,7 @@ class Foo {
 }
 ```
 ### Dumping profile to json file
-```hx
+```haxe
 Profiler.profileBlockStart("block2");
 // Work you want profile
 Profiler.profileBlockEnd();
@@ -41,7 +41,7 @@ Profiler.profileBlockEnd();
 Profiler.dumpToJsonFile("profile_dump.json");
 ```
 ### Print generated json
-```hx
+```haxe
 Profiler.profileBlockStart("block2");
 // Work you want profile
 Profiler.profileBlockEnd();
