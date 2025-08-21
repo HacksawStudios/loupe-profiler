@@ -1,7 +1,8 @@
 {
     "name": "loupe-profiler",
+    "url": "https://github.com/HacksawStudios/loupe-profiler",
     "license": "MIT",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "description": "loupe-profiler",
     "releasenote": "",
     "contributors": [
