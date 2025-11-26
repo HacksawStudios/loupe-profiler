@@ -403,4 +403,26 @@ class Profiler {
 
 		return fields;
 	}
+
+	/**
+		Forces the thread to sleep for x miliseconds, completely blocking all execution.
+
+		@param ms The amount of time to sleep
+
+		@example
+		```haxe
+		Profiler.profileBlockStart('block1');
+		Profiler.sleep(100.0);
+		Profiler.profileBlockEnd();
+
+		Profiler.dumpToJsonFile('profile_dump.json');
+		```
+	**/
+	public static function sleep(ms:Int):Void {
+		var start:Float = timestamp();
+		var end = start + ms;
+		while (timestamp() < end) {
+			// spin
+		}
+	}
 }
