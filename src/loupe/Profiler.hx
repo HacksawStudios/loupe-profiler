@@ -202,14 +202,14 @@ class Profiler {
 		}
 
 		return macro {
-			Profiler.profileBlockStart($v{name});
+			loupe.Profiler.profileBlockStart($v{name});
 			try {
 				$body;
 			} catch (e:Dynamic) {
-				Profiler.profileBlockEnd();
+				loupe.Profiler.profileBlockEnd();
 				throw e;
 			}
-			Profiler.profileBlockEnd();
+			loupe.Profiler.profileBlockEnd();
 		}
 	}
 
